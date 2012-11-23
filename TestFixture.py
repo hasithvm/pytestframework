@@ -9,6 +9,7 @@ class TestFixture:
 		self.case_list = self.__load_testcases(case_file)
 		self.testcase_count = len(self.case_list)
 		self.testcases_passed = []
+		self.error_msg = ""
 	
 	def getCaseCount(self):
 		return self.testcase_count
@@ -33,21 +34,22 @@ class TestFixture:
 	def evaluateTestCases(self, executable_path):
 		if executable_path == "":
 			raise Exception("Can't find executable to test!")
-		return self.__run_tests(executable_path, self.case_list)
+		return self.__run_tests(executable_path)
 		
-	def __run_tests(self, testpath, testcases):
+	def __run_tests(self, testpath):
 		error_msg = ""
 		for i in range(0, self.testcase_count):
-			test_process = ExecutionFrame(path=testpath,timeout=1,stdin=testcases[i]['input'])
+			test_process = ExecutionFrame(path=testpath,timeout=1,stdin=self.case_list[i]['input'],callback = self.__run_test_callback, identifier=i)
 			test_process.Run()
-			executionState =  test_process.getTerminateFlag()
-			stdout_data = test_process.getOutput()
 			
-			if (stdout_data.strip() == testcases[i]['output'] and not executionState):
-				self.testcases_passed.append(i)
-			elif executionState:
-				error_msg += "Testcase #" + str(i) + " did not return within the allotted time!\n"
-			else:
-				error_msg +=  "Testcase #" +  str(i) + " failed!" + "\n"
-		return (self.testcase_count - len(self.testcases_passed)), error_msg
-			
+	def __run_test_callback(self, test_process):
+		executionState =  test_process.getTerminateFlag()
+		stdout_data = test_process.getOutput()
+		print stdout_data
+		if (stdout_data == self.case_list[test_process.getCustomProcessIdentifer()]['output'] and not executionState):
+			self.testcases_passed.append(test_process.getCustomProcessIdentifer())
+		elif executionState:
+			self.error_msg += "Testcase #" + str(i) + " did not return within the allotted time!\n"
+		else:
+			self.error_msg +=  "Testcase #" +  str(i) + " failed!" + "\n"
+		print (self.testcase_count - len(self.testcases_passed)), self.error_msg		
