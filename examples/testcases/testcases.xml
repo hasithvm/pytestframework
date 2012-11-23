@@ -1,0 +1,17 @@
+<testcases>
+<case>
+	<def datatype = "input">This is a test string
+	 can we do multiline stuff?</def>
+	<def datatype = "output">13</def>
+</case>
+<case>
+	<def datatype = "input">can you handle 00034$%@#$%?</def>
+	<def datatype = "output">5</def>
+</case>
+<case>
+	<def datatype = "input">00034$%@#$%?</def>
+	<def datatype = "output">0</def>
+</case>
+</testcases>
+
+
