@@ -1,7 +1,7 @@
 import sys
 import subprocess
 from xml.dom import minidom
-from ExecutionFrame import ExecutionFrame
+from ExecutionFrame import AsyncExecutionFrame
 
 
 class TestFixture:
@@ -39,17 +39,17 @@ class TestFixture:
 	def __run_tests(self, testpath):
 		error_msg = ""
 		for i in range(0, self.testcase_count):
-			test_process = ExecutionFrame(path=testpath,timeout=1,stdin=self.case_list[i]['input'],callback = self.__run_test_callback, identifier=i)
+			test_process = AsyncExecutionFrame(path=testpath,timeout=1.0,stdin=self.case_list[i]['input'],callback = self.__run_test_callback, identifier=i)
 			test_process.Run()
 			
 	def __run_test_callback(self, test_process):
+		testid = test_process.getCustomProcessIdentifer()
 		executionState =  test_process.getTerminateFlag()
 		stdout_data = test_process.getOutput()
-		print stdout_data
-		if (stdout_data == self.case_list[test_process.getCustomProcessIdentifer()]['output'] and not executionState):
-			self.testcases_passed.append(test_process.getCustomProcessIdentifer())
+		if (stdout_data == self.case_list[testid]['output'] and not executionState):
+			self.testcases_passed.append(testid)
 		elif executionState:
-			self.error_msg += "Testcase #" + str(i) + " did not return within the allotted time!\n"
+			self.error_msg += "Testcase #" + str(testid) + " did not return within the allotted time!\n"
 		else:
-			self.error_msg +=  "Testcase #" +  str(i) + " failed!" + "\n"
+			self.error_msg +=  "Testcase #" +  str(testid) + " failed!" + "\n"
 		print (self.testcase_count - len(self.testcases_passed)), self.error_msg		
