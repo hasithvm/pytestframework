@@ -1,4 +1,5 @@
 import threading, subprocess
+from threading import Lock
 class BaseExecutionFrame(threading.Thread):
 	def __init__(self, *args, **kwargs):
 		threading.Thread.__init__(self)
@@ -53,7 +54,7 @@ class AsyncExecutionFrame(BaseExecutionFrame):
 	def __init__(self, *args,**kwargs):
 		BaseExecutionFrame.__init__(self, *args, **kwargs)
 		self.callback = kwargs.get('callback', None)
-
+		self.mutex = Lock()
 	def Run(self):
 		if (self.completion_handler == None):
 			raise Exception("No callback function for asynchronous execution.")
@@ -73,4 +74,6 @@ class AsyncExecutionFrame(BaseExecutionFrame):
 			self.completion_handler()
 
 	def completion_handler(self):
+		self.mutex.acquire()
 		self.callback(self)
+		self.mutex.release()

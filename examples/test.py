@@ -19,9 +19,13 @@ while (True):
 		
 	except EOFError:
 		break	
+vc = 0
+for i in range(ord('A'), ord('Z') + 1):
+	vc = 0
+	for line in lines:
+		if line[0].upper() == chr(i):
+			vc = vc + 1
+	if (vc != 0):
+		print chr(i) + ":" + str(vc)
 
-for line in lines:
-	vowelcount = vowelcount + count_vowels(line)
-	
-print vowelcount	
 

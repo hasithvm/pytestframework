@@ -35,16 +35,6 @@ def compile_source(source_path):
 
 
 
-			
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
 	try:
